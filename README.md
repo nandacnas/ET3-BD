@@ -1,1 +1,1 @@
-# ET3-BD
+Último ET da disciplina de Banco de Dados.
