@@ -233,6 +233,7 @@ DO INSTEAD NOTHING;
 
 
 -- H NUM SEI PROGRAMAR
+```
 CREATE OR REPLACE FUNCTION FUNC_NUM_BAIXAS()
 RETURNS trigger AS
 $BODY$
@@ -272,8 +273,122 @@ EXECUTE PROCEDURE FUNC_NUM_BAIXAS();
 CREATE TRIGGER AFT_NUM_BAIXAS
 AFTER UPDATE ON DIVISAO
 EXECUTE PROCEDURE zera_att();
+```
+CREATE OR REPLACE FUNCTION FUNC_NUM_BAIXAS()
+RETURNS trigger AS
+$BODY$
+BEGIN
+        IF INSERTING THEN
+                UPDATE GRUPO_ARMADO
+                SET NUM_BAIXAS_GRUPO = (SELECT SUM(NUM_BAIXAS_DIVISAO) 
+                                        FROM DIVISAO
+                                        WHERE COD_GRUPO = NEW.COD_GRUPO)
+                WHERE COD_GRUPO = OLD.COD_GRUPO;
+        ELSIF UPDATING THEN
+                UPDATE GRUPO_ARMADO
+                SET NUM_BAIXAS_GRUPO = (SELECT SUM(NUM_BAIXAS_DIVISAO) 
+                                        FROM DIVISAO
+                                        WHERE COD_GRUPO = OLD.COD_GRUPO)
+                WHERE COD_GRUPO = OLD.COD_GRUPO;
+
+                UPDATE GRUPO_ARMADO
+                SET NUM_BAIXAS_GRUPO = (SELECT SUM(NUM_BAIXAS_DIVISAO) 
+                                        FROM DIVISAO
+                                        WHERE COD_GRUPO = NEW.COD_GRUPO)
+                WHERE COD_GRUPO = NEW.COD_GRUPO;
+        ELSE 
+                UPDATE GRUPO_ARMADO
+                SET NUM_BAIXAS_GRUPO = (SELECT SUM(NUM_BAIXAS_DIVISAO) 
+                                        FROM DIVISAO
+                                        WHERE COD_GRUPO = OLD.COD_GRUPO)
+                WHERE COD_GRUPO = OLD.COD_GRUPO;
+        END IF;
+END;
+$BODY$
+LANGUAGE plpgsql;
+
+CREATE TRIGGER UPDATE_NUM_BAIXAS 
+AFTER INSERT OR UPDATE OR DELETE ON DIVISAO
+FOR EACH ROW 
+EXECUTE PROCEDURE FUNC_NUM_BAIXAS();
+
+
+
+
 
 --h pt2
+CREATE OR REPLACE FUNCTION FUNC_SEQUENCE_DIVISAO2()
+RETURNS trigger AS
+$BODY$
+DECLARE
+        i int;
+        total int;
+BEGIN           
+        IF UPDATING ('NUM_DIVISAO') THEN  
+                RAISE EXCEPTION 'Você nao pode atualizar o NUM_DIVISAO da tabela 
+                DIVISAO. Os outros dados foram atualizados';
+                UPDATE DIVISAO
+                SET NUM_DIVISAO = OLD.NUM_DIVISAO
+                WHERE COD_GRUPO = OLD.COD_GRUPO AND NUM_DIVISAO = i+1;
+        ELSIF  UPDATING('COD_GRUPO') OR DELETING THEN
+                i :=  OLD.NUM_DIVISAO;
+                total = (SELECT CONT(NUM_DIVISAO) 
+                         FROM DIVISAO 
+                         WHERE COD_GRUPO = OLD.COD_GRUPO);
+
+                WHILE i < total LOOP
+                        UPDATE DIVISAO
+                        SET NUM_DIVISAO = i
+                        WHERE COD_GRUPO = OLD.COD_GRUPO AND NUM_DIVISAO = i+1;
+                        i := i + 1;
+                END LOOP;   
+        END IF;
+        IF UPDATING('COD_GRUPO') THEN 
+                total = (SELECT CONT(NUM_DIVISAO) 
+                FROM DIVISAO 
+                WHERE COD_GRUPO = NEW.COD_GRUPO);
+                UPDATE DIVISAO
+                SET NUM_DIVISAO = total
+                WHERE COD_GRUPO = NEW.COD_GRUPO AND NUM_DIVISAO = NEW.NUM_DIVISAO;
+        END IF;
+END;
+$BODY$
+LANGUAGE plpgsql;
+
+CREATE TRIGGER UPDATE_SEQUENCE_DIVISAO2
+AFTER UPDATE OR DELETE ON DIVISAO
+FOR EACH ROW 
+EXECUTE PROCEDURE FUNC_SEQUENCE_DIVISAO2();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 CREATE FUNCTION SEQ_NUM_DIVISAO()
 ALTER SEQUENCE SEQ_NUM_DIV RESTART WITH 1;
 UPDATE DIVISAO SET NUM_DIVISAO = nextval('SEQ_NUM_DIV');
