@@ -3,7 +3,6 @@ RESTA FAZER:
 
 + Pergunta de UPDATE que fiz pro professor 
 + testar oq ja fizemos
-+ Comecar a parte 2
 
 '''
 
@@ -128,14 +127,14 @@ CREATE RULE U_MIN_CHEFES_IN_DIVISAO AS
 ON UPDATE TO CHEFE_MILITAR
 WHERE ((SELECT COUNT(*) 
         FROM CHEFE_MILITAR
-        WHERE D_NRO_DIVISAO = OLD.D_NRO_DIVISAO) < 1)
+        WHERE NRO_DIVISAO = OLD.NRO_DIVISAO) < 1)
 DO INSTEAD NOTHING;
 
 CREATE RULE D_MIN_CHEFES_IN_DIVISAO AS
 ON DELETE TO CHEFE_MILITAR
 WHERE ((SELECT COUNT(*) 
         FROM CHEFE_MILITAR
-        WHERE D_NRO_DIVISAO = OLD.D_NRO_DIVISAO) < 1)
+        WHERE NRO_DIVISAO = OLD.NRO_DIVISAO) < 1)
 DO INSTEAD NOTHING;
 
 
@@ -145,14 +144,14 @@ CREATE RULE I_MAX_CHEFES_IN_DIVISAO AS
 ON INSERT TO CHEFE_MILITAR 
 WHERE ((SELECT COUNT(*) 
         FROM CHEFE_MILITAR
-        WHERE D_NRO_DIVISAO = NEW.D_NRO_DIVISAO) > 3)
+        WHERE NRO_DIVISAO = NEW.NRO_DIVISAO) > 3)
 DO INSTEAD NOTHING;
 
 CREATE RULE U_MAX_CHEFES_IN_DIVISAO AS
 ON UPDATE TO CHEFE_MILITAR 
 WHERE ((SELECT COUNT(*) 
         FROM CHEFE_MILITAR
-        WHERE D_NRO_DIVISAO = NEW.D_NRO_DIVISAO) > 3)
+        WHERE NRO_DIVISAO = NEW.NRO_DIVISAO) > 3)
 DO INSTEAD NOTHING;
 
 
@@ -214,7 +213,7 @@ BEGIN
                 SET NUM_BAIXAS_GRUPO = (SELECT SUM(NUM_BAIXAS_DIVISAO) 
                                         FROM DIVISAO
                                         WHERE COD_GRUPO = NEW.COD_GRUPO)
-                WHERE COD_GRUPO = OLD.COD_GRUPO;
+                WHERE COD_GRUPO = NEW.COD_GRUPO;
         ELSIF UPDATING THEN
                 UPDATE GRUPO_ARMADO
                 SET NUM_BAIXAS_GRUPO = (SELECT SUM(NUM_BAIXAS_DIVISAO) 
@@ -290,6 +289,81 @@ CREATE TRIGGER UPDATE_SEQUENCE_DIVISAO2
 AFTER UPDATE OR DELETE ON DIVISAO
 FOR EACH ROW 
 EXECUTE PROCEDURE FUNC_SEQUENCE_DIVISAO2();
+
+
+-- I
+
+CREATE OR REPLACE FUNCTION FUNC_NUM_BAIXAS_CONFLITO()
+RETURNS trigger AS
+$BODY$
+BEGIN
+        IF INSERTING THEN
+                UPDATE CONFLITO as T
+                SET NUM_BAIXAS_GRUPO = (SELECT SUM(NUM_BAIXAS_GRUPO) 
+                                        FROM GRUPO_ARMADO
+                                        WHERE COD_GRUPO = (SELECT COD_GRUPO 
+                                                           FROM GRUPOS_x_CONFLITOS 
+                                                           WHERE COD_CONFLITO = T.COD_GRUPO))
+                WHERE COD_CONFLITO = (SELECT COD_CONFLITO
+                                      FROM GRUPOS_x_CONFLITOS
+                                      WHERE COD_GRUPO = NEW.COD_GRUPO);
+        ELSIF UPDATING THEN
+                UPDATE CONFLITO as T
+                SET NUM_BAIXAS_GRUPO = (SELECT SUM(NUM_BAIXAS_GRUPO) 
+                                        FROM GRUPO_ARMADO
+                                        WHERE COD_GRUPO = (SELECT COD_GRUPO 
+                                                           FROM GRUPOS_x_CONFLITOS 
+                                                           WHERE COD_CONFLITO = T.COD_GRUPO))
+                WHERE COD_CONFLITO = (SELECT COD_CONFLITO
+                                      FROM GRUPOS_x_CONFLITOS
+                                      WHERE COD_GRUPO = OLD.COD_GRUPO);
+
+
+                SET NUM_BAIXAS_GRUPO = (SELECT SUM(NUM_BAIXAS_GRUPO) 
+                                        FROM GRUPO_ARMADO
+                                        WHERE COD_GRUPO = (SELECT COD_GRUPO 
+                                                           FROM GRUPOS_x_CONFLITOS 
+                                                           WHERE COD_CONFLITO = T.COD_GRUPO))
+                WHERE COD_CONFLITO = (SELECT COD_CONFLITO
+                                      FROM GRUPOS_x_CONFLITOS
+                                      WHERE COD_GRUPO = NEW.COD_GRUPO);
+
+
+        ELSE 
+                SET NUM_BAIXAS_GRUPO = (SELECT SUM(NUM_BAIXAS_GRUPO) 
+                                        FROM GRUPO_ARMADO
+                                        WHERE COD_GRUPO = (SELECT COD_GRUPO 
+                                                           FROM GRUPOS_x_CONFLITOS 
+                                                           WHERE COD_CONFLITO = T.COD_GRUPO))
+                WHERE COD_CONFLITO = (SELECT COD_CONFLITO
+                                      FROM GRUPOS_x_CONFLITOS
+                                      WHERE COD_GRUPO = OLD.COD_GRUPO);
+        END IF;
+END;
+$BODY$
+LANGUAGE plpgsql;
+
+CREATE TRIGGER UPDATE_NUM_BAIXAS_CONFLITO
+AFTER INSERT OR UPDATE OR DELETE ON GRUPO_ARMADO
+FOR EACH ROW 
+EXECUTE PROCEDURE FUNC_NUM_BAIXAS_CONFLITO();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
