@@ -319,6 +319,7 @@ BEGIN
                                       WHERE COD_GRUPO = OLD.COD_GRUPO);
 
 
+                UPDATE CONFLITO as T
                 SET NUM_BAIXAS_GRUPO = (SELECT SUM(NUM_BAIXAS_GRUPO) 
                                         FROM GRUPO_ARMADO
                                         WHERE COD_GRUPO = (SELECT COD_GRUPO 
@@ -330,6 +331,7 @@ BEGIN
 
 
         ELSE 
+                UPDATE CONFLITO as T
                 SET NUM_BAIXAS_GRUPO = (SELECT SUM(NUM_BAIXAS_GRUPO) 
                                         FROM GRUPO_ARMADO
                                         WHERE COD_GRUPO = (SELECT COD_GRUPO 
