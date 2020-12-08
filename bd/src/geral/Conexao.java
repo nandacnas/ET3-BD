@@ -13,7 +13,7 @@ public class Conexao{
     private Connection con;
     
     public Conexao(){
-        url = "jdbc:postgresql://localhost:5432/EP3.4";
+        url = "jdbc:postgresql://localhost:5432/EP3.16";
         usuario = "userPostgres";
         senha = "ramed";
 

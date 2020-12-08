@@ -10,8 +10,10 @@ import geral.Conexao;
 import tabelasDoBD.GrupoArmado;
 
 public class ConfGrupoArmado {
-	Conexao conex = new Conexao();
-	
+	Conexao conex;
+	public  ConfGrupoArmado() {
+		conex = new Conexao();
+	}
 	public void salvar(GrupoArmado grupo) {
 		try {
 			conex.conexao();
@@ -86,4 +88,27 @@ public class ConfGrupoArmado {
 		}
 		return grupo;
 	}
+	
+	public GrupoArmado buscaUnica(int cod) {
+		GrupoArmado grupo = new GrupoArmado();
+		
+		conex.conexao();
+		conex.executaSQL("SELECT * FROM GRUPO_ARMADO WHERE COD_GRUPO = "+ cod +";");
+		
+		try {
+			conex.getResultSet().first();
+
+			grupo.setCod_grupo(conex.getResultSet().getInt("COD_GRUPO"));
+			grupo.setNome_grupo(conex.getResultSet().getString("NOME_GRUPO"));
+			grupo.setNum_baixas_grupo(conex.getResultSet().getInt("NUM_BAIXAS_GRUPO"));
+
+			
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, "Erro ao buscar grupo", "ATENCAO", JOptionPane.ERROR_MESSAGE);
+			e.printStackTrace();
+		}
+		return grupo;
+	}
+	
+	
 }

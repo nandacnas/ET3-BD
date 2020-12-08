@@ -18,10 +18,38 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import confTabelasJavaBD.ConfChefeMilitar;
+import confTabelasJavaBD.ConfConflitoEconomico;
+import confTabelasJavaBD.ConfConflitoRacial;
+import confTabelasJavaBD.ConfConflitoReligiao;
+import confTabelasJavaBD.ConfConflitoTerritorial;
+import confTabelasJavaBD.ConfConflitos;
+import confTabelasJavaBD.ConfDialoga;
 import confTabelasJavaBD.ConfDivisao;
+import confTabelasJavaBD.ConfFornece;
 import confTabelasJavaBD.ConfGrupoArmado;
+import confTabelasJavaBD.ConfGruposXconflitos;
+import confTabelasJavaBD.ConfLiderPolitico;
+import confTabelasJavaBD.ConfMedia;
+import confTabelasJavaBD.ConfOrganizacaoM;
+import confTabelasJavaBD.ConfPais;
+import confTabelasJavaBD.ConfTipoArma;
+import tabelasDoBD.ChefeMilitar;
+import tabelasDoBD.Conflito;
+import tabelasDoBD.ConflitoEconomico;
+import tabelasDoBD.ConflitoRacial;
+import tabelasDoBD.ConflitoReligioso;
+import tabelasDoBD.ConflitoTerritorial;
+import tabelasDoBD.De_media;
+import tabelasDoBD.Dialoga;
 import tabelasDoBD.Divisao;
+import tabelasDoBD.Fornece;
 import tabelasDoBD.GrupoArmado;
+import tabelasDoBD.GruposXconflitos;
+import tabelasDoBD.LiderPolitico;
+import tabelasDoBD.OrganizacaoM;
+import tabelasDoBD.Pais;
+import tabelasDoBD.TipoArma;
 
 
 public class Inserir {
@@ -48,6 +76,8 @@ public class Inserir {
 		combo.addItem("Cadastrar paises em conflito");//10
 		combo.addItem("Cadastrar Armas");//11
 		combo.addItem("Cadastrar fornecimendo das armas aos grupos armados");//12
+		combo.addItem("Cadastrar motivo do conflito");//13
+
 		
 	}
 	
@@ -95,6 +125,9 @@ public class Inserir {
 		case 12:
 			cadastro = fornece();
 			break;
+		case 13:
+			cadastro = motivoConflito();
+			break;
 		default:
 			cadastro = null;
 			break;
@@ -102,6 +135,7 @@ public class Inserir {
 		}
 		return cadastro;
 	}
+
 
 
 
@@ -256,11 +290,15 @@ public class Inserir {
 		JLabel lbltipo = new JLabel("Tipo do conflito:  ");
 		lbltipo.setFont(new Font("Serif",Font.BOLD,15));
 		
+		
+		/*
 		JTextField especificacao = new JTextField(15);
 		especificacao.setPreferredSize(new Dimension(100, 30));
 		JLabel lblespecificacao = new JLabel("      Escolha o tipo do conflito*  ");
 		lblespecificacao.setFont(new Font("Serif",Font.BOLD,15));
 		especificacao.setEnabled(false);
+		
+		
 		
 		tipo.addItemListener(new ItemListener() {
 
@@ -295,8 +333,8 @@ public class Inserir {
         			break;
         		}
             }
-       });
-		
+       	});
+		*/
 		
 		
 		
@@ -306,26 +344,57 @@ public class Inserir {
 		
 		f2.add(lbltipo);
 		f2.add(tipo); 
-		f2.add(lblespecificacao);
-		f2.add(especificacao);
+		//f2.add(lblespecificacao);
+		//f2.add(especificacao);
 		
 		
+
 		
 		
-		
-		
-		
-		
-		
-		JPanel f3 = new JPanel(new GridBagLayout());
+		//JPanel f3 = new JPanel(new GridBagLayout());
 		JButton botao = new JButton("Cadastrar");  
 		botao.setPreferredSize(new Dimension(180, 30));
-		f3.add(botao);
+		JLabel lblbotao = new JLabel("                              ");
+		lblbotao.setFont(new Font("Serif",Font.BOLD,15));
+		f2.add(lblbotao);
+		f2.add(botao);
+		
+		
+		
+		
+		
+		
+		
+		
+		botao.addActionListener(new ActionListener() {
+		
+	    	public void actionPerformed(ActionEvent e) {
+	    		Conflito conflito = new Conflito();
+	    		ConfConflitos config = new ConfConflitos();
+	    		
+	    		
+	    		conflito.setNome(nome.getText());
+	    		conflito.setNum_feridos(Integer.parseInt(feridos.getText()));
+	    		conflito.setNum_mortos(0);
+	    		conflito.setTipo((String)tipo.getSelectedItem());
+	    		
+	  	    		
+	    		config.salvar(conflito);
+	    		
+	    		nome.setText("");
+	    		feridos.setText("");
+	    		tipo.setSelectedIndex(0);
+
+	    	}
+
+		});
+		
+		
 		
 		
 		cadastro.add(f1);
 		cadastro.add(f2);
-		cadastro.add(f3);
+		//cadastro.add(f3);
 
 		//LEMBRE DO NUMERO DE MORTOS QUANDO FOR FAZER OS EVENTOS DO BOTAO
 		
@@ -403,6 +472,16 @@ public class Inserir {
 		JLabel lblbotao = new JLabel("                                           ");
 		lblbotao.setFont(new Font("Serif",Font.BOLD,15));
 
+		
+		ArrayList<GrupoArmado> itens = null;
+    	ConfGrupoArmado config = new ConfGrupoArmado();
+    	itens = config.lista();
+    	grupo.addItem("Selecione um grupo...");
+    	for (GrupoArmado s : itens) 
+			grupo.addItem(s.getNome_grupo());
+		
+		
+		
 		f3.add(lblgrupo);
 		f3.add(grupo);
 		f3.add(lblbotao);
@@ -412,7 +491,25 @@ public class Inserir {
 		cadastro.add(f1);
 		cadastro.add(f3);
 
-		// caixa combo com grupo
+		botao.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    		LiderPolitico lider = new LiderPolitico();
+	    		ConfLiderPolitico config = new ConfLiderPolitico();
+	    		
+	    		lider.setApoios(apoiadores.getText());
+	    		lider.setNome_grupo((String)grupo.getSelectedItem());
+	    		lider.setNome_lider(nome.getText());
+
+	    		
+	    		config.salvar(lider);
+	    		
+	    		apoiadores.setText("");
+	    		nome.setText("");
+	    		grupo.setSelectedIndex(0);
+
+	    	}
+    	});
+		
 		return cadastro;
 	}
 
@@ -428,9 +525,22 @@ public class Inserir {
 		lblfaixa.setFont(new Font("Serif",Font.BOLD,15));
 		
 		JComboBox lider = new JComboBox<String>();
-		lider.setPreferredSize(new Dimension(220, 30));
+		lider.setPreferredSize(new Dimension(300, 30));
 		JLabel lbllider = new JLabel("     Obedece o lider politico:  ");
 		lbllider.setFont(new Font("Serif",Font.BOLD,15));
+		
+		ArrayList<LiderPolitico> itens = null;
+    	ConfLiderPolitico config = new ConfLiderPolitico();
+    	itens = config.lista();
+    	lider.addItem("Selecione um lider...");
+    	for (LiderPolitico s : itens) {
+			String itemDaCombo = "Grupo: '"+ s.getNome_grupo().trim() +"'    Nome: '"+ s.getNome_lider().trim() +"'";
+    		lider.addItem(itemDaCombo);
+    	}
+    		
+		
+		
+		
 		
 		f1.add(lblfaixa);
 		f1.add(faixa); 
@@ -442,35 +552,76 @@ public class Inserir {
 		
 		JPanel f2 = new JPanel(new GridBagLayout());
 		JComboBox divisao = new JComboBox<String>();
-		divisao.setPreferredSize(new Dimension(220, 30));
+		divisao.setPreferredSize(new Dimension(300, 30));
 		JLabel lbldivisao = new JLabel("Dirige a divisao:  ");
 		lbldivisao.setFont(new Font("Serif",Font.BOLD,15));
 		
 
-		JComboBox grupo = new JComboBox<String>();
-		grupo.setPreferredSize(new Dimension(220, 30));
-		JLabel lblgrupo = new JLabel("         Pertence ao grupo:  ");
-		lblgrupo.setFont(new Font("Serif",Font.BOLD,15));
+		
+		
+		
+		ArrayList<Divisao> itens2 = null;
+    	ConfDivisao config2 = new ConfDivisao();
+    	itens2 = config2.lista();
+    	divisao.addItem("Selecione uma divisao...");
+    	for (Divisao s : itens2) {
+			String itemDaCombo = "Grupo: '"+ s.getNome_grupo().trim() +"'   Divisao Nº: '"+ s.getNum_divisao() +"'";
+			divisao.addItem(itemDaCombo);
+    	}
+		
+    	
+    	
+    	
 
+		JButton botao = new JButton("Cadastrar");  
+		botao.setPreferredSize(new Dimension(180, 30));
+		JLabel lblbotao = new JLabel("                                           ");
+		lblbotao.setFont(new Font("Serif",Font.BOLD,15));
+
+
+		
 		
 		f2.add(lbldivisao);
 		f2.add(divisao); 
-		f2.add(lblgrupo);
-		f2.add(grupo);
+		f2.add(lblbotao);
+		f2.add(botao);
 		
 		
 
-		JPanel f3 = new JPanel(new GridBagLayout());
-		JButton botao = new JButton("Cadastrar");  
-		botao.setPreferredSize(new Dimension(180, 30));
-		f3.add(botao);
-		
 		
 		cadastro.add(f1);
 		cadastro.add(f2);
-		cadastro.add(f3);
 
-		//LEMBRE DOS COMBOBOXS AAAAAAAAA
+
+		botao.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    		ChefeMilitar chefe = new ChefeMilitar();
+	    		ConfChefeMilitar config = new ConfChefeMilitar();
+	    		
+	    		
+	    		String converte = (String)lider.getSelectedItem();
+	    		String[] infoPL = converte.split("'");
+	    		
+	    		converte = (String)divisao.getSelectedItem();
+	    		String[] infoD = converte.split("'"); 
+	    		
+	    		//POSICAO grupo[1] e nome/numero[3]
+	    		
+	    		chefe.setFaixa(faixa.getText());
+	    		chefe.setLP_nome_lider(infoPL[3]);
+	    		chefe.setLP_nome_grupo(infoPL[1]);
+	    		chefe.setD_nro_divisao(Integer.parseInt(infoD[3]));
+	    		chefe.setD_nome_grupo(infoD[1]);
+	    		
+	    		config.salvar(chefe);
+	    		
+	    		faixa.setText("");
+	    		lider.setSelectedIndex(0);
+	    		divisao.setSelectedIndex(0);
+
+
+	    	}
+    	});
 		
 		return cadastro;
 	}
@@ -527,7 +678,29 @@ public class Inserir {
 		cadastro.add(f2);
 		cadastro.add(f3);
 
-		//LEMBRE DOS COMBOBOXS
+		
+		botao.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    		OrganizacaoM org = new OrganizacaoM();
+	    		ConfOrganizacaoM config = new ConfOrganizacaoM();
+	    		
+	    		
+	    		org.setNome_org(nome.getText());
+	    		org.setTipo_org(tipo.getText());
+	    		org.setTipo_ajuda(tipoAjuda.getText());
+	    		org.setNum_pessoas(Integer.parseInt(numPessoas.getText()));
+
+
+	    		config.salvar(org);
+	    		
+	    		nome.setText("");
+	    		tipo.setText("");
+	    		tipoAjuda.setText("");
+	    		numPessoas.setText("");
+
+	    	}
+    	});
+		
 		
 		return cadastro;
 		
@@ -543,37 +716,50 @@ public class Inserir {
 		JPanel f2 = new JPanel(new GridBagLayout());
 		
 		JComboBox lider = new JComboBox<String>();
-		lider.setPreferredSize(new Dimension(220, 30));
+		lider.setPreferredSize(new Dimension(300, 30));
 		JLabel lbllider = new JLabel("Lider politico:  ");
-		lbllider.setFont(new Font("Serif",Font.BOLD,15));		
+		lbllider.setFont(new Font("Serif",Font.BOLD,15));
 		
-		JComboBox grupo = new JComboBox<String>();
-		grupo.setPreferredSize(new Dimension(220, 30));
-		JLabel lblgrupo = new JLabel("      Politico Pertence ao grupo:  ");
-		lblgrupo.setFont(new Font("Serif",Font.BOLD,15));
+		ArrayList<LiderPolitico> itens = null;
+    	ConfLiderPolitico config = new ConfLiderPolitico();
+    	itens = config.lista();
+    	lider.addItem("Selecione um lider...");
+    	for (LiderPolitico s : itens) {
+			String itemDaCombo = "Grupo: '"+ s.getNome_grupo().trim() +"'    Nome: '"+ s.getNome_lider().trim() +"'";
+    		lider.addItem(itemDaCombo);
+    	}
+    		
+		
+		
+		
+		JComboBox organizacao = new JComboBox<String>();
+		organizacao.setPreferredSize(new Dimension(250, 30));
+		JLabel lblorganizacao = new JLabel("       Organizacao:  ");
+		lblorganizacao.setFont(new Font("Serif",Font.BOLD,15));
+		
+		
+		ArrayList<OrganizacaoM> itens2 = null;
+    	ConfOrganizacaoM config2 = new ConfOrganizacaoM();
+    	itens2 = config2.lista();
+    	organizacao.addItem("Selecione uma organizacao...");
+    	for (OrganizacaoM s : itens2) 
+    		organizacao.addItem(s.getNome_org());
+		
+		
 		
 		f2.add(lbllider);
 		f2.add(lider); 
-		f2.add(lblgrupo);
-		f2.add(grupo);
+		f2.add(lblorganizacao);
+		f2.add(organizacao);
 		
 		
 		
 		JPanel f3 = new JPanel(new GridBagLayout());
-		
-		JComboBox organizacao = new JComboBox<String>();
-		organizacao.setPreferredSize(new Dimension(220, 30));
-		JLabel lblorganizacao = new JLabel("Organizacao:  ");
-		lblorganizacao.setFont(new Font("Serif",Font.BOLD,15));
 
 		JButton botao = new JButton("Cadastrar");  
 		botao.setPreferredSize(new Dimension(180, 30));
-		JLabel lblbotao = new JLabel("                                   ");
-		lblbotao.setFont(new Font("Serif",Font.BOLD,15));
+
 		
-		f3.add(lblorganizacao);
-		f3.add(organizacao);
-		f3.add(lblbotao);
 		f3.add(botao);
 		
 		
@@ -584,8 +770,28 @@ public class Inserir {
 		
 		
 		
+		botao.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    		Dialoga dialoga = new Dialoga();
+	    		ConfDialoga config = new ConfDialoga();
+	    		
+	    		String converte = (String)lider.getSelectedItem();
+	    		String[] infoPL = converte.split("'");
+	    		
+	    		
+	    		dialoga.setNome_grupo(infoPL[1]);
+	    		dialoga.setNome_lider(infoPL[3]);
+	    		dialoga.setNome_org((String)organizacao.getSelectedItem());
+
+	    		config.salvar(dialoga);
+	    		
+	    		lider.setSelectedIndex(0);
+	    		organizacao.setSelectedIndex(0);
+
+	    	}
+    	});
 		
-		// COMBOOOOOOOOOBOX
+		
 		return cadastro;
 	}
 	
@@ -601,10 +807,25 @@ public class Inserir {
 		JLabel lblorganizacao = new JLabel("Organizacao:  ");
 		lblorganizacao.setFont(new Font("Serif",Font.BOLD,15));		
 		
+		ArrayList<OrganizacaoM> itens2 = null;
+    	ConfOrganizacaoM config2 = new ConfOrganizacaoM();
+    	itens2 = config2.lista();
+    	organizacao.addItem("Selecione uma organizacao...");
+    	for (OrganizacaoM s : itens2) 
+    		organizacao.addItem(s.getNome_org());
+		
+		
 		JComboBox conflito = new JComboBox<String>();
 		conflito.setPreferredSize(new Dimension(220, 30));
 		JLabel lblconflito = new JLabel("         Conflito:  ");
 		lblconflito.setFont(new Font("Serif",Font.BOLD,15));
+		
+		ArrayList<Conflito> itens = null;
+    	ConfConflitos config = new ConfConflitos();
+    	itens = config.lista();
+    	conflito.addItem("Selecione um conflito...");
+    	for (Conflito s : itens) 
+    		conflito.addItem(s.getNome());
 		
 		f1.add(lblorganizacao);
 		f1.add(organizacao); 
@@ -639,7 +860,24 @@ public class Inserir {
 
 		
 		
-		// COMBOOOOOOOOOBOX AQUI TBMMM
+		botao.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    		De_media media = new De_media();
+	    		ConfMedia config = new ConfMedia();
+	    		
+	    		
+	    		media.setDe_media(data.getText());
+	    		media.setNome_conflito((String)conflito.getSelectedItem());
+	    		media.setNome_org((String)organizacao.getSelectedItem());
+
+	    		config.salvar(media);
+	    		
+	    		data.setText("");
+	    		conflito.setSelectedIndex(0);
+	    		organizacao.setSelectedIndex(0);
+
+	    	}
+    	});
 		
 		return cadastro;
 	}
@@ -656,10 +894,24 @@ public class Inserir {
 		JLabel lblconflito = new JLabel("Conflito:  ");
 		lblconflito.setFont(new Font("Serif",Font.BOLD,15));		
 		
+		ArrayList<Conflito> itens = null;
+    	ConfConflitos config = new ConfConflitos();
+    	itens = config.lista();
+    	conflito.addItem("Selecione um conflito...");
+    	for (Conflito s : itens) 
+    		conflito.addItem(s.getNome());
+		
 		JComboBox grupo = new JComboBox<String>();
 		grupo.setPreferredSize(new Dimension(220, 30));
 		JLabel lblgrupo = new JLabel("           Grupo Armado:  ");
 		lblgrupo.setFont(new Font("Serif",Font.BOLD,15));
+		
+		ArrayList<GrupoArmado> itens2 = null;
+    	ConfGrupoArmado config2 = new ConfGrupoArmado();
+    	itens2 = config2.lista();
+    	grupo.addItem("Selecione um grupo...");
+    	for (GrupoArmado s : itens2) 
+			grupo.addItem(s.getNome_grupo());
 		
 		f2.add(lblconflito);
 		f2.add(conflito); 
@@ -683,12 +935,31 @@ public class Inserir {
 		
 		
 		
-		// COMBOOOOOOOOOBOX
+		botao.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    		GruposXconflitos x = new GruposXconflitos();
+	    		ConfGruposXconflitos config = new ConfGruposXconflitos();
+	    		
+	    		x.setNome_conflito((String)conflito.getSelectedItem());
+	    		x.setNome_grupo((String)grupo.getSelectedItem());
+
+	    		config.salvar(x);
+	    		
+	    		conflito.setSelectedIndex(0);
+	    		grupo.setSelectedIndex(0);
+
+	    	}
+    	});
+		
+		
+		
+		
 		return cadastro;
 	}
 	
 	
 	private JPanel paises() {
+
 		JPanel cadastro = new JPanel(new GridLayout(4, 1));
 		
 		
@@ -703,6 +974,13 @@ public class Inserir {
 		conflito.setPreferredSize(new Dimension(220, 30));
 		JLabel lblconflito = new JLabel("         Conflito que participa:  ");
 		lblconflito.setFont(new Font("Serif",Font.BOLD,15));
+		
+		ArrayList<Conflito> itens = null;
+    	ConfConflitos config = new ConfConflitos();
+    	itens = config.lista();
+    	conflito.addItem("Selecione um conflito...");
+    	for (Conflito s : itens) 
+    		conflito.addItem(s.getNome());
 			
 		f1.add(lblpais);
 		f1.add(pais); 
@@ -721,7 +999,22 @@ public class Inserir {
 		
 		
 		
-		//COMBOOOOOOOBOX DE NOVO
+		botao.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    		Pais p = new Pais();
+	    		ConfPais config = new ConfPais();
+	    		
+	    		
+	    		p.setPais(pais.getText());
+	    		p.setNome_conflito((String)conflito.getSelectedItem());
+
+	    		config.salvar(p);
+	    		
+	    		pais.setText("");
+	    		conflito.setSelectedIndex(0);
+
+	    	}
+    	});
 		return cadastro;
 	}
 	
@@ -737,15 +1030,15 @@ public class Inserir {
 		JLabel lblarma = new JLabel("Nome da Arma:  ");
 		lblarma.setFont(new Font("Serif",Font.BOLD,15));
 		
-		JTextField tipo = new JTextField(15);
-		tipo.setPreferredSize(new Dimension(100, 30));
-		JLabel lbltipo = new JLabel("        Tipo da Arma:  ");
-		lbltipo.setFont(new Font("Serif",Font.BOLD,15));
+		JTextField indicador = new JTextField(15);
+		indicador.setPreferredSize(new Dimension(100, 30));
+		JLabel lblindicador = new JLabel("          Indicador da Arma:  ");
+		lblindicador.setFont(new Font("Serif",Font.BOLD,15));
 		
 		f1.add(lblarma);
 		f1.add(arma); 
-		f1.add(lbltipo);
-		f1.add(tipo);
+		f1.add(lblindicador);
+		f1.add(indicador);
 		
 		JPanel f2 = new JPanel(new GridBagLayout());
 		
@@ -756,11 +1049,31 @@ public class Inserir {
 		cadastro.add(f1);
 		cadastro.add(f2);
 		
+		
+		
+		botao.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    		TipoArma tipoArma = new TipoArma();
+	    		ConfTipoArma config = new ConfTipoArma();
+	    		
+	    		tipoArma.setNome_arma(arma.getText());
+	    		tipoArma.setIndicador(Integer.parseInt(indicador.getText()));
+	    		
+
+	    		config.salvar(tipoArma);
+	    		
+	    		arma.setText("");
+	    		indicador.setText("");
+
+
+	    	}
+    	});
+		
+		
 		return cadastro;
 	}
 
 	
-
 	private JPanel fornece() {
 		JPanel cadastro = new JPanel(new GridLayout(4, 1));
 		
@@ -772,10 +1085,26 @@ public class Inserir {
 		JLabel lblgrupo = new JLabel("Grupo:  ");
 		lblgrupo.setFont(new Font("Serif",Font.BOLD,15));
 		
+		ArrayList<GrupoArmado> itens = null;
+    	ConfGrupoArmado config = new ConfGrupoArmado();
+    	itens = config.lista();
+    	grupo.addItem("Selecione um grupo...");
+    	for (GrupoArmado s : itens) 
+			grupo.addItem(s.getNome_grupo());
+			
+		
 		JComboBox arma = new JComboBox<String>();
 		arma.setPreferredSize(new Dimension(220, 30));
 		JLabel lblarma = new JLabel("               Arma:  ");
 		lblarma.setFont(new Font("Serif",Font.BOLD,15));
+		
+		ArrayList<TipoArma> itens2 = null;
+    	ConfTipoArma config2 = new ConfTipoArma();
+    	itens2 = config2.lista();
+    	arma.addItem("Selecione uma arma...");
+    	for (TipoArma s : itens2) 
+    		arma.addItem(s.getNome_arma());
+		
 			
 		f1.add(lblgrupo);
 		f1.add(grupo); 
@@ -815,9 +1144,197 @@ public class Inserir {
 		
 		
 		
-		// ULTIMO COMBOBOX
+		botao.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    		Fornece fornece = new Fornece();
+	    		ConfFornece config = new ConfFornece();
+	    		
+	    		fornece.setNome_grupo((String)grupo.getSelectedItem());
+	    		fornece.setNome_arma((String)arma.getSelectedItem());
+	    		fornece.setNome_traficante(traficante.getText());
+	    		fornece.setNum_armas(Integer.parseInt(numeroArmas.getText()));
+
+
+
+	    		config.salvar(fornece);
+	    		
+	    		grupo.setSelectedIndex(0);
+	    		arma.setSelectedIndex(0);
+	    		traficante.setText("");
+	    		numeroArmas.setText("");
+
+	    	}
+    	});
+		
+		
 		return cadastro;
 	}
 	
-	
+
+	private JPanel motivoConflito() {
+		JPanel cadastro = new JPanel(new GridLayout(4, 1));
+		
+		
+		
+
+		JPanel f1 = new JPanel(new GridBagLayout());
+		JComboBox conlfito = new JComboBox<String>();
+		conlfito.setPreferredSize(new Dimension(220, 30));
+		JLabel lblconflito = new JLabel("Conflito:  ");
+		lblconflito.setFont(new Font("Serif",Font.BOLD,15));
+		
+		JTextField especificacao = new JTextField(15);
+		especificacao.setPreferredSize(new Dimension(100, 30));
+		JLabel lblespecificacao = new JLabel("           Escolha o conflito*  ");
+		lblespecificacao.setFont(new Font("Serif",Font.BOLD,15));
+		especificacao.setEnabled(false);
+		
+		
+		ArrayList<Conflito> itens = null;
+    	ConfConflitos config = new ConfConflitos();
+    	itens = config.lista();
+		conlfito.addItem("Escolha conflito...");
+    	for (Conflito s : itens) 
+    		conlfito.addItem(s.getNome());
+		
+		
+		
+		
+		conlfito.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+            	if(conlfito.getSelectedIndex() == 0) {
+            		lblespecificacao.setText("           Escolha o conflito*  ");
+        			especificacao.setText("");
+        			especificacao.setEnabled(false);
+            		return;
+            	}
+            	
+            	
+            	Conflito conflitoEscolhido = config.buscaUnica((String)conlfito.getSelectedItem());
+            	
+            	
+            	//System.out.println("oq saiu: "+ conflitoEscolhido.getTipo());
+            	String tipoSemEspaco = conflitoEscolhido.getTipo().trim();
+            	
+            	if(tipoSemEspaco.equals("territorial")) {
+            		lblespecificacao.setText("            Nome da Regiao:  ");
+        			especificacao.setText("");
+        			especificacao.setEnabled(true);
+            	}else if(tipoSemEspaco.equals("religioso")) {
+            		lblespecificacao.setText("            Nome da Religiao:  ");
+        			especificacao.setText("");
+        			especificacao.setEnabled(true);
+            	}else if(tipoSemEspaco.equals("racial")) {
+            		lblespecificacao.setText("            Nome de Etinia:  ");
+        			especificacao.setText("");
+        			especificacao.setEnabled(true);
+            	}else if(tipoSemEspaco.equals("economico")) {
+            		lblespecificacao.setText("         Nome de Materia Prima:  ");
+        			especificacao.setText("");
+        			especificacao.setEnabled(true);
+            	}else {
+            		lblespecificacao.setText("           Escolha o conflito*  ");
+        			especificacao.setText("");
+        			especificacao.setEnabled(false);
+            	}
+                    	
+            }
+       	});
+       	
+       	
+		
+		f1.add(lblconflito);
+		f1.add(conlfito); 
+		f1.add(lblespecificacao);
+		f1.add(especificacao);
+		
+		
+
+		
+		
+		JPanel f2 = new JPanel(new GridBagLayout());
+		JButton botao = new JButton("Cadastrar");  
+		botao.setPreferredSize(new Dimension(180, 30));
+		JLabel lblbotao = new JLabel("                             ");
+		lblbotao.setFont(new Font("Serif",Font.BOLD,15));
+		f2.add(lblbotao);
+		f2.add(botao);
+		
+		
+		
+		
+		
+		
+		
+		
+		botao.addActionListener(new ActionListener() {
+		
+	    	public void actionPerformed(ActionEvent e) {
+	    		
+	    		Conflito conflitoEscolhido = config.buscaUnica((String)conlfito.getSelectedItem());
+	    		
+	    		String tipoSemEspaco = conflitoEscolhido.getTipo().trim();
+            	
+            	if(tipoSemEspaco.equals("territorial")) {
+            		
+            		ConflitoTerritorial conflito = new ConflitoTerritorial();
+    	    		ConfConflitoTerritorial config = new ConfConflitoTerritorial();
+    	    		
+    	    		
+    	    		conflito.setRegiao(especificacao.getText());
+    	    		conflito.setCod_conflito(conflitoEscolhido.getCod_conflito());
+    	  	    		
+    	    		config.salvar(conflito);
+
+            	}else if(tipoSemEspaco.equals("religioso")) {
+            		ConflitoReligioso conflito = new ConflitoReligioso();
+    	    		ConfConflitoReligiao config = new ConfConflitoReligiao();
+    	    		
+    	    		
+    	    		conflito.setReligiao(especificacao.getText());
+    	    		conflito.setCod_conflito(conflitoEscolhido.getCod_conflito());
+    	  	    		
+    	    		config.salvar(conflito);
+            	}else if(tipoSemEspaco.equals("racial")) {
+            		ConflitoRacial conflito = new ConflitoRacial();
+    	    		ConfConflitoRacial config = new ConfConflitoRacial();
+    	    		
+    	    		
+    	    		conflito.setEtnia(especificacao.getText());
+    	    		conflito.setCod_conflito(conflitoEscolhido.getCod_conflito());
+    	  	    		
+    	    		config.salvar(conflito);
+            	}else if(tipoSemEspaco.equals("economico")) {
+            		ConflitoEconomico conflito = new ConflitoEconomico();
+    	    		ConfConflitoEconomico config = new ConfConflitoEconomico();
+    	    		
+    	    		
+    	    		conflito.setMat_prima(especificacao.getText());
+    	    		conflito.setCod_conflito(conflitoEscolhido.getCod_conflito());
+    	  	    		
+    	    		config.salvar(conflito);
+            	}else {
+
+            	}
+	    		
+	    		lblespecificacao.setText("           Escolha o conflito*  ");
+    			especificacao.setText("");
+    			especificacao.setEnabled(false);
+    			conlfito.setSelectedIndex(0);
+
+	    	}
+
+		});
+		
+		
+		
+		
+		cadastro.add(f1);
+		cadastro.add(f2);
+		//cadastro.add(f3);
+
+		
+		return cadastro;
+	}
 }

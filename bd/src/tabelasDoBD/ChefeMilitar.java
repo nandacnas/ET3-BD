@@ -1,5 +1,7 @@
 package tabelasDoBD;
 
+import confTabelasJavaBD.ConfGrupoArmado;
+
 public class ChefeMilitar {
 
     private int cod_chefe;
@@ -8,7 +10,33 @@ public class ChefeMilitar {
     private int LP_cod_grupo;
     private int d_nro_divisao;
     private int d_cod_grupo;
+    private String LP_nome_grupo;
+    private String d_nome_grupo;
 
+    
+    
+    
+    public String getLP_nome_grupo(){
+        return this.LP_nome_grupo;
+    }
+
+    public void setLP_nome_grupo(String novo){
+        this.LP_nome_grupo = novo;
+        identificaGrupoLP();
+    }
+    
+    public String getD_nome_grupo(){
+        return this.d_nome_grupo;
+    }
+
+    public void setD_nome_grupo(String novo){
+        this.d_nome_grupo = novo;
+        identificaGrupoD();
+        
+    }
+    
+    
+    
     public int getCod_chefe(){
         return this.cod_chefe;
     }
@@ -56,4 +84,24 @@ public class ChefeMilitar {
     public void setD_cod_grupo(int novo){
         this.d_cod_grupo = novo;
     }
+    
+    
+    private void identificaGrupoLP() {
+    	ConfGrupoArmado config = new ConfGrupoArmado();
+    	GrupoArmado grupo = config.buscaUnica(getLP_nome_grupo());
+    	setLP_cod_grupo(grupo.getCod_grupo());
+	}
+    
+    private void identificaGrupoD() {
+    	ConfGrupoArmado config = new ConfGrupoArmado();
+    	GrupoArmado grupo = config.buscaUnica(getD_nome_grupo());
+    	setD_cod_grupo(grupo.getCod_grupo());
+	}
+    
+    
+    
+    
+    
+    
+    
 }

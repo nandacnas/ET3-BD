@@ -1,10 +1,23 @@
 package tabelasDoBD;
 
+import confTabelasJavaBD.ConfGrupoArmado;
+
 public class LiderPolitico {
 
+    private String nome_grupo;
     private String nome_lider;
     private int cod_grupo;
     private String apoios;
+    
+    
+    public String getNome_grupo(){
+        return this.nome_grupo;
+    }
+
+    public void setNome_grupo(String novo){
+        this.nome_grupo = novo;
+        identificaGrupo();
+    }
     
     public String getNome_lider(){
         return this.nome_lider;
@@ -29,4 +42,11 @@ public class LiderPolitico {
     public void setApoios(String novo){
         this.apoios = novo;
     }
+    
+    
+    private void identificaGrupo() {
+    	ConfGrupoArmado config = new ConfGrupoArmado();
+    	GrupoArmado grupo = config.buscaUnica(getNome_grupo());
+    	setCod_grupo(grupo.getCod_grupo());
+	}
 }

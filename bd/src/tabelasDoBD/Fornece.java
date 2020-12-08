@@ -1,5 +1,7 @@
 package tabelasDoBD;
 
+import confTabelasJavaBD.ConfGrupoArmado;
+
 public class Fornece {
 
     private int cod_grupo;
@@ -7,6 +9,20 @@ public class Fornece {
     private String nome_traficante;
     private int num_armas;
 
+    private String nome_grupo;
+    
+
+    public String getNome_grupo(){
+        return this.nome_grupo;
+    }
+
+    public void setNome_grupo(String novo){
+        this.nome_grupo = novo;
+        identificaGrupo();
+    }
+    
+    
+    
     public int getCod_grupo() {
         return cod_grupo;
     }
@@ -38,5 +54,20 @@ public class Fornece {
     public void setNum_armas(int num_armas) {
         this.num_armas = num_armas;
     }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    private void identificaGrupo() {
+    	ConfGrupoArmado config = new ConfGrupoArmado();
+    	GrupoArmado grupo = config.buscaUnica(getNome_grupo());
+    	setCod_grupo(grupo.getCod_grupo());
+	}
+    
 
 }

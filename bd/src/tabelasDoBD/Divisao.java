@@ -2,7 +2,7 @@ package tabelasDoBD;
 
 import confTabelasJavaBD.ConfGrupoArmado;
 
-public class Divisao {
+public class Divisao{
 
     private int num_divisao;
     private int cod_grupo;
