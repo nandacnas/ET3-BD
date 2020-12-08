@@ -128,20 +128,16 @@ public class Janela {
 		listas.addActionListener(new ActionListener() {
 	    	public void actionPerformed(ActionEvent e) {
 	    		pp.setVisible(false); 
-	    		
+	    		Pesquisar pesquisador = new Pesquisar();
 				
 				JButton voltar = new JButton("Voltar");  
 				JButton ir = new JButton("Ir");  
 				ir.setPreferredSize(new Dimension(50, 30));
 				voltar.setPreferredSize(new Dimension(100, 30));
-				JComboBox<String> combo = new JComboBox<String>();
-				combo.addItem("Escolha o que deseja...");
-				combo.addItem("Histograma por tipo de conflito e número de conflitos");
-				combo.addItem("Listar Traficantes e os grupos armados por armas “Barret M82” ou “M200 intervention”");
-				combo.addItem("Listar os 5 maiores conflitos em número de mortos");
-				combo.addItem("Listar as 5 maiores organizações em número de mediações");
-				combo.addItem("Listar os 5 maiores grupos armados com maior número de armas fornecidos");
-				combo.addItem("Listar o país e número de conflitos com maior número de conflitos religiosos");
+				
+				
+				
+				JComboBox<String> combo = pesquisador.getCombo();
 				combo.setPreferredSize(new Dimension(620, 30));
 				
 				JPanel pVolta = new JPanel(new BorderLayout());

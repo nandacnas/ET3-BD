@@ -291,55 +291,7 @@ public class Inserir {
 		lbltipo.setFont(new Font("Serif",Font.BOLD,15));
 		
 		
-		/*
-		JTextField especificacao = new JTextField(15);
-		especificacao.setPreferredSize(new Dimension(100, 30));
-		JLabel lblespecificacao = new JLabel("      Escolha o tipo do conflito*  ");
-		lblespecificacao.setFont(new Font("Serif",Font.BOLD,15));
-		especificacao.setEnabled(false);
-		
-		
-		
-		tipo.addItemListener(new ItemListener() {
-
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                // 
-            	switch (tipo.getSelectedIndex()) {
-        		case 1:
-        			lblespecificacao.setText("            Nome da Regiao:  ");
-        			especificacao.setText("");
-        			especificacao.setEnabled(true);
-        			break;
-        		case 2:
-        			lblespecificacao.setText("            Nome da Religiao:  ");
-        			especificacao.setText("");
-        			especificacao.setEnabled(true);
-        			break;
-        		case 3:
-        			lblespecificacao.setText("            Nome de Etinia:  ");
-        			especificacao.setText("");
-        			especificacao.setEnabled(true);
-        			break;
-        		case 4:
-        			lblespecificacao.setText("         Nome de Materia Prima:  ");
-        			especificacao.setText("");
-        			especificacao.setEnabled(true);
-        			break;
-        		default:
-        			lblespecificacao.setText("      Escolha o tipo do conflito*  ");
-        			especificacao.setText("");
-        			especificacao.setEnabled(false);
-        			break;
-        		}
-            }
-       	});
-		*/
-		
-		
-		
-		
-		
+	
 		
 		
 		f2.add(lbltipo);
